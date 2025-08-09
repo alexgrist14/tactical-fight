@@ -1,0 +1,89 @@
+import { type Unit, type Units } from "../types/Unit";
+import { UnitType, TeamType } from "../types/enums";
+import { v4 as uuidv4 } from "uuid";
+
+const unitTemplates = [
+  {
+    name: "Skeleton",
+    type: UnitType.MELEE,
+    health: 100,
+    initiative: 50,
+    damage: 25,
+  },
+  {
+    name: "Centaur",
+    type: UnitType.MELEE,
+    health: 150,
+    initiative: 50,
+    damage: 50,
+  },
+  {
+    name: "Bandit",
+    type: UnitType.RANGED,
+    health: 75,
+    initiative: 60,
+    damage: 30,
+  },
+  {
+    name: "Elf Archer",
+    type: UnitType.RANGED,
+    health: 90,
+    initiative: 60,
+    damage: 45,
+  },
+  {
+    name: "Skeleton mage",
+    type: UnitType.MAGE,
+    health: 90,
+    initiative: 40,
+    damage: 30,
+  },
+  { name: "Sirena", type: UnitType.PARALYZER, health: 80, initiative: 20 },
+
+  {
+    name: "Monk",
+    type: UnitType.HEALER_SINGLE,
+    health: 90,
+    initiative: 20,
+    heal: 40,
+  },
+  {
+    name: "Bishop",
+    type: UnitType.HEALER_MASS,
+    health: 130,
+    initiative: 20,
+    heal: 25,
+  },
+];
+
+export function initTeams(): { red: Units; blue: Units } {
+  const createTeam = (team: TeamType) => {
+    const units: Units = {};
+
+    for (let i = 0; i < 6; i++) {
+      const template =
+        unitTemplates[Math.floor(Math.random() * unitTemplates.length)];
+      const x = i % 3;
+      const y = Math.floor(i / 3);
+
+      units[`${y}-${x}`] = {
+        id: uuidv4(),
+        name: template.name,
+        type: template.type,
+        team,
+        health: template.health,
+        maxHealth: template.health,
+        damage: template.damage,
+        heal: template.heal,
+        initiative: template.initiative,
+        position: { x, y },
+        isDefending: false,
+        isParalyzed: false,
+      };
+    }
+
+    return units;
+  };
+
+  return { red: createTeam(TeamType.RED), blue: createTeam(TeamType.BLUE) };
+}
