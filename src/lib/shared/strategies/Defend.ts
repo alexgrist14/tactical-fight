@@ -4,14 +4,14 @@ export const defend: ActionStrategy = {
   getTargets: ({ current }) => {
     return [current];
   },
-  perform: ({ current, allies }) => {
-    const tempAllies = structuredClone(allies);
+  perform: ({ current, turnOrder }) => {
+    const tempOrder = structuredClone(turnOrder);
+    const target = tempOrder.find((unit) => unit.id === current.id);
 
-    tempAllies[`${current.position.y}-${current.position.x}`].isDefending =
-      true;
+    if (target) {
+      target.isDefending = true;
+    }
 
-    return {
-      alliesResult: tempAllies,
-    };
+    return tempOrder;
   },
 };

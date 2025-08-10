@@ -14,6 +14,7 @@ export interface Unit {
   isParalyzed?: boolean;
   isDefending?: boolean;
   isDead?: boolean;
+  icon: string;
 }
 
 export type UnitAction = "attack" | "defend" | "paralyze" | "heal";

@@ -1,14 +1,14 @@
 import { type ActionStrategy } from "./ActionStrategy";
 
 export const meleeAttack: ActionStrategy = {
-  getTargets: ({ current, enemies, allies }) => {
-    const teammates = Object.values(allies);
+  getTargets: ({ current, turnOrder }) => {
+    const teammates = turnOrder.filter((unit) => unit.team === current.team);
     const firstLineAllies = teammates.filter((ally) => ally.position.y === 0);
     const isFirstLineAlliesDead = !firstLineAllies.some((ally) => !ally.isDead);
 
     if (!isFirstLineAlliesDead && current.position.y !== 0) return [];
 
-    const targets = Object.values(enemies);
+    const targets = turnOrder.filter((unit) => unit.team !== current.team);
     const firstLine = targets.filter((e) => e.position.y === 0);
     const secondLine = targets.filter((e) => e.position.y === 1);
     const isFirstLineDead = !firstLine.some((unit) => !unit.isDead);
@@ -17,23 +17,24 @@ export const meleeAttack: ActionStrategy = {
     );
 
     return aliveEnemies.filter((e) => {
-      console.log(e, current);
       return (
         aliveEnemies.length === 1 ||
         Math.abs(e.position.x - current.position.x) <= 1
       );
     });
   },
-  perform: ({ current, target, enemies }) => {
+  perform: ({ current, target, turnOrder }) => {
     const damage = current.damage || 0;
     const effectiveDamage = target.isDefending ? damage * 0.5 : damage;
 
-    const tempEnemies = structuredClone(enemies);
-    const tempTarget = tempEnemies[`${target.position.y}-${target.position.x}`];
+    const tempOrder = structuredClone(turnOrder);
+    const tempTarget = tempOrder.find((unit) => unit.id === target.id);
 
-    tempTarget.health -= effectiveDamage;
-    if (tempTarget.health <= 0) tempTarget.isDead = true;
+    if (tempTarget) {
+      tempTarget.health -= effectiveDamage;
+      if (tempTarget.health <= 0) tempTarget.isDead = true;
+    }
 
-    return { enemiesResult: tempEnemies };
+    return tempOrder;
   },
 };

@@ -1,4 +1,4 @@
-import { type Unit, type Units } from "../types/Unit";
+import { type Unit } from "../types/Unit";
 import { UnitType, TeamType } from "../types/enums";
 import { v4 as uuidv4 } from "uuid";
 
@@ -9,6 +9,7 @@ const unitTemplates = [
     health: 100,
     initiative: 50,
     damage: 25,
+    icon: "BTNSkeletonWarrior.png",
   },
   {
     name: "Centaur",
@@ -16,6 +17,7 @@ const unitTemplates = [
     health: 150,
     initiative: 50,
     damage: 50,
+    icon: "BTNCentaurKhan.png",
   },
   {
     name: "Bandit",
@@ -23,6 +25,7 @@ const unitTemplates = [
     health: 75,
     initiative: 60,
     damage: 30,
+    icon: "BTNBandit.png",
   },
   {
     name: "Elf Archer",
@@ -30,6 +33,7 @@ const unitTemplates = [
     health: 90,
     initiative: 60,
     damage: 45,
+    icon: "BTNHighElvenArcher.png",
   },
   {
     name: "Skeleton mage",
@@ -37,8 +41,15 @@ const unitTemplates = [
     health: 90,
     initiative: 40,
     damage: 30,
+    icon: "BTNSkeletonMage.png",
   },
-  { name: "Sirena", type: UnitType.PARALYZER, health: 80, initiative: 20 },
+  {
+    name: "Sirena",
+    type: UnitType.PARALYZER,
+    health: 80,
+    initiative: 20,
+    icon: "BTNNagaSummoner.png",
+  },
 
   {
     name: "Monk",
@@ -46,6 +57,7 @@ const unitTemplates = [
     health: 90,
     initiative: 20,
     heal: 40,
+    icon: "BTNPandarenBrewmaster.png",
   },
   {
     name: "Bishop",
@@ -53,12 +65,13 @@ const unitTemplates = [
     health: 130,
     initiative: 20,
     heal: 25,
+    icon: "BTNPriest.png",
   },
 ];
 
-export function initTeams(): { red: Units; blue: Units } {
+export function initTeams(): { red: Unit[]; blue: Unit[] } {
   const createTeam = (team: TeamType) => {
-    const units: Units = {};
+    const units: Unit[] = [];
 
     for (let i = 0; i < 6; i++) {
       const template =
@@ -66,7 +79,7 @@ export function initTeams(): { red: Units; blue: Units } {
       const x = i % 3;
       const y = Math.floor(i / 3);
 
-      units[`${y}-${x}`] = {
+      units.push({
         id: uuidv4(),
         name: template.name,
         type: template.type,
@@ -79,7 +92,8 @@ export function initTeams(): { red: Units; blue: Units } {
         position: { x, y },
         isDefending: false,
         isParalyzed: false,
-      };
+        icon: template.icon,
+      });
     }
 
     return units;

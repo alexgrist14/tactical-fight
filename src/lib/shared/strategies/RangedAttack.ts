@@ -1,19 +1,21 @@
 import { type ActionStrategy } from "./ActionStrategy";
 
 export const rangedAttack: ActionStrategy = {
-  getTargets: ({ enemies }) => {
-    return Object.values(enemies).filter((e) => !e.isDead);
+  getTargets: ({ current, turnOrder }) => {
+    return turnOrder.filter((e) => e.team !== current.team && !e.isDead);
   },
-  perform: ({ current, target, enemies }) => {
+  perform: ({ current, target, turnOrder }) => {
     const damage = current.damage || 0;
     const effectiveDamage = target.isDefending ? damage * 0.5 : damage;
 
-    const tempEnemies = structuredClone(enemies);
-    const tempTarget = tempEnemies[`${target.position.y}-${target.position.x}`];
+    const tempOrder = structuredClone(turnOrder);
+    const tempTarget = tempOrder.find((unit) => unit.id === target.id);
 
-    tempTarget.health -= effectiveDamage;
-    if (tempTarget.health <= 0) tempTarget.isDead = true;
+    if (tempTarget) {
+      tempTarget.health -= effectiveDamage;
+      if (tempTarget.health <= 0) tempTarget.isDead = true;
+    }
 
-    return { enemiesResult: tempEnemies };
+    return tempOrder;
   },
 };

@@ -1,22 +1,23 @@
 import { type ActionStrategy } from "./ActionStrategy";
 
 export const mageAttack: ActionStrategy = {
-  getTargets: ({ enemies }) => {
-    return Object.values(enemies).filter((e) => !e.isDead);
+  getTargets: ({ current, turnOrder }) => {
+    return turnOrder.filter((e) => e.team !== current.team && !e.isDead);
   },
-  perform: ({ current, enemies }) => {
+  perform: ({ current, turnOrder }) => {
     const damage = current.damage || 0;
 
-    const tempEnemies = structuredClone(enemies);
+    const tempOrder = structuredClone(turnOrder);
 
-    Object.keys(tempEnemies).forEach((key) => {
-      const tempTarget = tempEnemies[key];
-      const effectiveDamage = tempTarget.isDefending ? damage * 0.5 : damage;
+    tempOrder.forEach((unit) => {
+      if (unit.isDead || unit.team === current.team) return;
 
-      tempTarget.health -= effectiveDamage;
-      if (tempTarget.health <= 0) tempTarget.isDead = true;
+      const effectiveDamage = unit.isDefending ? damage * 0.5 : damage;
+
+      unit.health -= effectiveDamage;
+      if (unit.health <= 0) unit.isDead = true;
     });
 
-    return { enemiesResult: tempEnemies };
+    return tempOrder;
   },
 };

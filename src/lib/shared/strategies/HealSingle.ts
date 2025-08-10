@@ -1,20 +1,21 @@
 import { type ActionStrategy } from "./ActionStrategy";
 
 export const healSingle: ActionStrategy = {
-  getTargets: ({ allies }) => {
-    return Object.values(allies).filter((e) => !e.isDead);
+  getTargets: ({ current, turnOrder }) => {
+    return turnOrder.filter((u) => u.team === current.team && !u.isDead);
   },
-  perform: ({ current, target, allies }) => {
-    console.log(current);
+  perform: ({ current, target, turnOrder }) => {
     const heal = current.heal || 0;
 
-    const tempAllies = structuredClone(allies);
-    const tempTarget = tempAllies[`${target.position.y}-${target.position.x}`];
+    const tempOrder = structuredClone(turnOrder);
+    const tempTarget = tempOrder.find((unit) => unit.id === target.id);
 
-    const resultHeal = tempTarget.health + heal;
-    tempTarget.health =
-      resultHeal > tempTarget.maxHealth ? tempTarget.maxHealth : resultHeal;
+    if (tempTarget) {
+      const resultHeal = tempTarget.health + heal;
+      tempTarget.health =
+        resultHeal > tempTarget.maxHealth ? tempTarget.maxHealth : resultHeal;
+    }
 
-    return { alliesResult: tempAllies };
+    return tempOrder;
   },
 };

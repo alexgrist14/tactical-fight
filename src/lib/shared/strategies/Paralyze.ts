@@ -1,16 +1,18 @@
 import { type ActionStrategy } from "./ActionStrategy";
 
 export const paralyze: ActionStrategy = {
-  getTargets: ({ enemies }) => {
-    return Object.values(enemies).filter((e) => !e.isDead);
+  getTargets: ({ current, turnOrder }) => {
+    return turnOrder.filter((e) => e.team !== current.team && !e.isDead);
   },
-  perform: ({ target, enemies }) => {
-    const tempEnemies = structuredClone(enemies);
-    const tempTarget = tempEnemies[`${target.position.y}-${target.position.x}`];
+  perform: ({ target, turnOrder }) => {
+    const tempOrder = structuredClone(turnOrder);
+    const tempTarget = tempOrder.find((unit) => unit.id === target.id);
 
-    tempTarget.isParalyzed = true;
-    tempTarget.isDefending = false;
+    if (tempTarget) {
+      tempTarget.isParalyzed = true;
+      tempTarget.isDefending = false;
+    }
 
-    return { enemiesResult: tempEnemies };
+    return tempOrder;
   },
 };

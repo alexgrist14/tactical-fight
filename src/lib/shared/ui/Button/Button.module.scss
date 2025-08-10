@@ -1,0 +1,36 @@
+.button {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+
+    &_accent {
+        color: white;
+        background-color: rgb(78, 78, 230);
+    }
+
+    &_edit {
+        color: white;
+        background-color: rgb(100, 179, 48);
+    }
+
+    &_danger {
+        color: white;
+        background-color: rgb(197, 14, 14);
+    }
+
+    &:hover,
+    &:focus-visible,
+    &_active {
+        filter: brightness(1.2);
+    }
+
+    &:active {
+        filter: contrast(0.8);
+    }
+
+    &:disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+}
