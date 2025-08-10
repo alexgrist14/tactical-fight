@@ -3,6 +3,11 @@
     padding: 0;
     border-radius: 0 0 8px 8px;
     background-color: white;
+    user-select: none;
+
+    &_active {
+        border-radius: 0;
+    }
 
     .name {
         width: 100%;
@@ -42,6 +47,16 @@
             object-fit: cover;
         }
 
+        .svg {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 16px;
+            height: 16px;
+            z-index: 9991;
+            color: rgb(88, 128, 236);
+        }
+
         .health {
             position: absolute;
             left: 0;
@@ -72,4 +87,10 @@
 
 .defending {
     background-color: blue;
+}
+
+.hovered {
+    outline: 2px solid #3a7afe;
+    box-shadow: 0 0 8px #3a7afe;
+    z-index: 10;
 }

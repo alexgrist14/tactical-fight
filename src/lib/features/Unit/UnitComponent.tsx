@@ -1,22 +1,30 @@
-import React from "react";
+import React, { type FC } from "react";
 import type { Unit } from "../../shared/types/Unit";
 import styles from "./UnitComponent.module.scss";
 import classNames from "classnames";
+import { SvgStun } from "../../shared/ui/SvgStun/SvgStun";
+import { SvgShield } from "../../shared/ui/SvgShield/SvgShield";
 
-type Props = {
+interface UnitComponentProps {
   unit: Unit;
   isCurrent: boolean;
   isSelectable?: boolean;
   hideInfo?: boolean;
   onClick?: () => void;
-};
+  isHovered?: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+}
 
-export const UnitComponent: React.FC<Props> = ({
+export const UnitComponent: FC<UnitComponentProps> = ({
   unit,
   isCurrent,
   isSelectable,
   hideInfo,
   onClick,
+  isHovered,
+  onMouseEnter,
+  onMouseLeave,
 }) => {
   const percent = 100 - (unit.health / unit.maxHealth) * 100;
 
@@ -28,14 +36,22 @@ export const UnitComponent: React.FC<Props> = ({
         [styles.paralyzed]: unit.isParalyzed,
         [styles.defending]: unit.isDefending,
         [styles.current_active]: isCurrent && hideInfo,
+        [styles.container_active]: isCurrent && hideInfo,
+        [styles.hovered]: isHovered,
       })}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       style={{
         opacity: unit.isDead ? 0.3 : 1,
         cursor: isSelectable ? "pointer" : "default",
       }}
     >
       <div className={styles.content}>
+        {unit.isParalyzed && (
+          <SvgStun className={styles.svg} pathStyle={{ fill: "white" }} />
+        )}
+        {unit.isDefending && <SvgShield className={styles.svg} />}
         <img className={styles.icon} src={`/${unit.icon}`} alt={unit.name} />
         {percent < 100 && (
           <div

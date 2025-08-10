@@ -14,21 +14,16 @@ import { healMass } from "../../shared/strategies/HealMass";
 import styles from "./Battlefield.module.scss";
 import Button from "../../shared/ui/Button/Button";
 import RoundInfo from "../RoundInfo/RoundInfo";
-
-const redGrid = [
-  ["1-0", "1-1", "1-2"],
-  ["0-0", "0-1", "0-2"],
-];
-const blueGrid = [
-  ["0-0", "0-1", "0-2"],
-  ["1-0", "1-1", "1-2"],
-];
+import Team from "./Team/Team";
+import { blueGrid, redGrid } from "../../shared/utils/common";
 
 export const Game: React.FC = () => {
   const [turnOrder, setTurnOrder] = useState<Unit[]>([]);
+  const [hoveredUnitId, setHoveredUnitId] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [possibleTargets, setPossibleTargets] = useState<Unit[]>([]);
   const [actionType, setActionType] = useState<UnitAction>();
+  const [winner, setWinner] = useState<TeamType | null>(null);
 
   useEffect(() => {
     const { red, blue } = initTeams();
@@ -36,9 +31,27 @@ export const Game: React.FC = () => {
     const units = [...Object.values(red), ...Object.values(blue)].sort(
       (a, b) => b.initiative - a.initiative || Math.random() - 0.5
     );
-    console.log(units);
     setTurnOrder(units);
   }, []);
+
+  useEffect(() => {
+    const redAlive = turnOrder.some(
+      (u) => u.team === TeamType.RED && !u.isDead
+    );
+
+    console.log(redAlive);
+    const blueAlive = turnOrder.some(
+      (u) => u.team === TeamType.BLUE && !u.isDead
+    );
+
+    console.log(blueAlive);
+
+    if (!redAlive) {
+      setWinner(TeamType.BLUE);
+    } else if (!blueAlive) {
+      setWinner(TeamType.RED);
+    }
+  }, [turnOrder]);
 
   const currentUnit = turnOrder[currentIndex];
   const nextUnit =
@@ -141,119 +154,134 @@ export const Game: React.FC = () => {
     }
   };
 
-  const renderTeam = (type: TeamType) => {
-    const grid = type === "red" ? redGrid : blueGrid;
-    const team = turnOrder.filter((unit) => unit.team === type);
+  // const renderTeam = (type: TeamType) => {
+  //   const grid = type === "red" ? redGrid : blueGrid;
+  //   const team = turnOrder.filter((unit) => unit.team === type);
 
-    return (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 100px)",
-          gap: 10,
-        }}
-      >
-        {grid.map((row) =>
-          row.map((key) => {
-            const unit = team.find(
-              (u) => `${u.position.y}-${u.position.x}` === key
-            );
+  //   return (
+  //     <div
+  //       style={{
+  //         display: "grid",
+  //         gridTemplateColumns: "repeat(3, 100px)",
+  //         gap: 10,
+  //       }}
+  //     >
+  //       {grid.map((row) =>
+  //         row.map((key) => {
+  //           const unit = team.find(
+  //             (u) => `${u.position.y}-${u.position.x}` === key
+  //           );
 
-            if (!unit) return null;
+  //           if (!unit) return null;
 
-            return (
-              <UnitComponent
-                key={unit.id}
-                unit={unit}
-                isCurrent={unit.id === currentUnit?.id}
-                isSelectable={possibleTargets.some((t) => t.id === unit.id)}
-                onClick={() =>
-                  possibleTargets.some((t) => t.id === unit.id) &&
-                  handleTargetClick(unit)
-                }
-              />
-            );
-          })
-        )}
-      </div>
-    );
-  };
-
+  //           return (
+  //             <UnitComponent
+  //               key={unit.id}
+  //               unit={unit}
+  //               isCurrent={unit.id === currentUnit?.id}
+  //               isSelectable={possibleTargets.some((t) => t.id === unit.id)}
+  //               onClick={() =>
+  //                 possibleTargets.some((t) => t.id === unit.id) &&
+  //                 handleTargetClick(unit)
+  //               }
+  //               isHovered={hoveredUnitId === unit.id}
+  //             />
+  //           );
+  //         })
+  //       )}
+  //     </div>
+  //   );
+  // };
   if (!currentUnit) return <div>Loading...</div>;
-
   return (
     <div className={styles.container}>
       <div className={styles.container__top}>
         <div className={styles.teams__container}>
           <div className={styles.teams}>
             <h2 style={{ color: "rgb(236, 73, 73)" }}>RED TEAM</h2>
-            {renderTeam(TeamType.RED)}
+
+            <Team
+              team={turnOrder.filter((unit) => unit.team === TeamType.RED)}
+              teamGrid={redGrid}
+              possibleTargets={possibleTargets}
+              hoveredUnitId={hoveredUnitId}
+              currentUnit={currentUnit}
+              handleTargetClick={handleTargetClick}
+            />
           </div>
           <div className={styles.teams}>
             <h2 style={{ color: "rgb(73, 73, 236)" }}>BLUE TEAM</h2>
-            {renderTeam(TeamType.BLUE)}
+            <Team
+              team={turnOrder.filter((unit) => unit.team === TeamType.BLUE)}
+              teamGrid={blueGrid}
+              possibleTargets={possibleTargets}
+              hoveredUnitId={hoveredUnitId}
+              currentUnit={currentUnit}
+              handleTargetClick={handleTargetClick}
+            />
           </div>
         </div>
 
         <div className={styles.actions}>
-          {/* <h3>
-            Current Unit: {currentUnit.name} ({currentUnit.team})
-          </h3>
-          <h3>
-            Next Unit: {nextUnit.name} ({nextUnit.team})
-          </h3> */}
-
-          <div className={styles.actions__container}>
-            {[UnitType.MAGE, UnitType.MELEE, UnitType.RANGED].includes(
-              currentUnit.type
-            ) && (
+          {winner ? (
+            <h3>Winner: {winner} team</h3>
+          ) : (
+            <div className={styles.actions__container}>
+              {[UnitType.MAGE, UnitType.MELEE, UnitType.RANGED].includes(
+                currentUnit.type
+              ) && (
+                <Button
+                  className={styles.button}
+                  color="danger"
+                  onClick={() => handleActionSelect("attack")}
+                >
+                  Attack
+                </Button>
+              )}
+              {[UnitType.PARALYZER].includes(currentUnit.type) && (
+                <Button
+                  className={styles.button}
+                  color="primary"
+                  onClick={() => handleActionSelect("paralyze")}
+                >
+                  Paralyze
+                </Button>
+              )}
+              {[UnitType.HEALER_SINGLE].includes(currentUnit.type) && (
+                <Button
+                  className={styles.button}
+                  color="edit"
+                  onClick={() => handleActionSelect("heal")}
+                >
+                  Heal
+                </Button>
+              )}
+              {[UnitType.HEALER_MASS].includes(currentUnit.type) && (
+                <Button
+                  className={styles.button}
+                  color="edit"
+                  onClick={() => handleActionSelect("heal")}
+                >
+                  Mass Heal
+                </Button>
+              )}
               <Button
                 className={styles.button}
-                color="danger"
-                onClick={() => handleActionSelect("attack")}
+                color="accent"
+                onClick={() => handleActionSelect("defend")}
               >
-                Attack
+                Defend
               </Button>
-            )}
-            {[UnitType.PARALYZER].includes(currentUnit.type) && (
-              <Button
-                className={styles.button}
-                color="primary"
-                onClick={() => handleActionSelect("paralyze")}
-              >
-                Paralyze
-              </Button>
-            )}
-            {[UnitType.HEALER_SINGLE].includes(currentUnit.type) && (
-              <Button
-                className={styles.button}
-                color="edit"
-                onClick={() => handleActionSelect("heal")}
-              >
-                Heal
-              </Button>
-            )}
-            {[UnitType.HEALER_MASS].includes(currentUnit.type) && (
-              <Button
-                className={styles.button}
-                color="edit"
-                onClick={() => handleActionSelect("heal")}
-              >
-                Mass Heal
-              </Button>
-            )}
-            <Button
-              className={styles.button}
-              color="accent"
-              onClick={() => handleActionSelect("defend")}
-            >
-              Defend
-            </Button>
-          </div>
+            </div>
+          )}
         </div>
       </div>
-
-      <RoundInfo unitsTurnOrder={turnOrder} currentUnit={currentUnit} />
+      <RoundInfo
+        unitsTurnOrder={turnOrder}
+        currentUnit={currentUnit}
+        hoveredUnitId={hoveredUnitId}
+        setHoveredUnitId={setHoveredUnitId}
+      />
     </div>
   );
 };

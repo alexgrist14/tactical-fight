@@ -69,7 +69,7 @@ const unitTemplates = [
   },
 ];
 
-export function initTeams(): { red: Unit[]; blue: Unit[] } {
+export const initTeams = (): { red: Unit[]; blue: Unit[] } => {
   const createTeam = (team: TeamType) => {
     const units: Unit[] = [];
 
@@ -100,4 +100,4 @@ export function initTeams(): { red: Unit[]; blue: Unit[] } {
   };
 
   return { red: createTeam(TeamType.RED), blue: createTeam(TeamType.BLUE) };
-}
+};

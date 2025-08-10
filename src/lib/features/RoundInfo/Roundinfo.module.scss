@@ -8,6 +8,10 @@
     .units {
         display: flex;
         gap: 10px;
+
+        div {
+            cursor: pointer;
+        }
     }
 
     h2 {
