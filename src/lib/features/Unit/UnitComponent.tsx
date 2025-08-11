@@ -1,9 +1,9 @@
-import React, { type FC } from "react";
-import type { Unit } from "../../shared/types/Unit";
-import styles from "./UnitComponent.module.scss";
 import classNames from "classnames";
-import { SvgStun } from "../../shared/ui/SvgStun/SvgStun";
+import { useMemo, type FC } from "react";
+import type { Unit } from "../../shared/types/Unit";
 import { SvgShield } from "../../shared/ui/SvgShield/SvgShield";
+import { SvgStun } from "../../shared/ui/SvgStun/SvgStun";
+import styles from "./UnitComponent.module.scss";
 
 interface UnitComponentProps {
   unit: Unit;
@@ -26,7 +26,10 @@ export const UnitComponent: FC<UnitComponentProps> = ({
   onMouseEnter,
   onMouseLeave,
 }) => {
-  const percent = 100 - (unit.health / unit.maxHealth) * 100;
+  const percent = useMemo(
+    () => 100 - (unit.health / unit.maxHealth) * 100,
+    [unit.health, unit.maxHealth]
+  );
 
   return (
     <div
@@ -38,14 +41,11 @@ export const UnitComponent: FC<UnitComponentProps> = ({
         [styles.current_active]: isCurrent && hideInfo,
         [styles.container_active]: isCurrent && hideInfo,
         [styles.hovered]: isHovered,
+        [styles.dead]: unit.isDead,
       })}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      style={{
-        opacity: unit.isDead ? 0.3 : 1,
-        cursor: isSelectable ? "pointer" : "default",
-      }}
     >
       <div className={styles.content}>
         {unit.isParalyzed && (
@@ -58,8 +58,6 @@ export const UnitComponent: FC<UnitComponentProps> = ({
             className={styles.health}
             style={{
               height: `${percent}%`,
-              opacity: 0.4,
-              transition: "height 0.5s",
             }}
           />
         )}

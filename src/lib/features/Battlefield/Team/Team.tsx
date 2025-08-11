@@ -1,6 +1,7 @@
 import { type FC } from "react";
 import type { Unit } from "../../../shared/types/Unit";
 import { UnitComponent } from "../../Unit/UnitComponent";
+import styles from "./Team.module.scss";
 
 interface TeamProps {
   teamGrid: string[][];
@@ -20,13 +21,7 @@ const Team: FC<TeamProps> = ({
   handleTargetClick,
 }) => {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 100px)",
-        gap: 10,
-      }}
-    >
+    <div className={styles.container}>
       {teamGrid.map((row) =>
         row.map((key) => {
           const unit = team.find(

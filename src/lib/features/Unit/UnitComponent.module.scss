@@ -53,7 +53,7 @@
             left: 10px;
             width: 16px;
             height: 16px;
-            z-index: 9991;
+            z-index: 2;
             color: rgb(88, 128, 236);
         }
 
@@ -64,6 +64,7 @@
             width: 100%;
             background-color: red;
             z-index: 1;
+            opacity: 0.4;
             transition: height 0.3s;
         }
     }
@@ -79,6 +80,7 @@
 
 .selectable {
     outline: 2px solid green;
+    cursor: pointer;
 }
 
 .paralyzed {
@@ -93,4 +95,8 @@
     outline: 2px solid #3a7afe;
     box-shadow: 0 0 8px #3a7afe;
     z-index: 10;
+}
+
+.dead {
+    opacity: 0.3;
 }

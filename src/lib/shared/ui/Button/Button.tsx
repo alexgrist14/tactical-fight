@@ -2,7 +2,7 @@ import { type ButtonHTMLAttributes, type FC } from "react";
 import styles from "./Button.module.scss";
 import classNames from "classnames";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   color?: "primary" | "accent" | "edit" | "danger";
   className?: string;
 }

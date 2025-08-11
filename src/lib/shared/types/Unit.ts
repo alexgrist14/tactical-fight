@@ -18,5 +18,3 @@ export interface Unit {
 }
 
 export type UnitAction = "attack" | "defend" | "paralyze" | "heal";
-
-export type Units = { [key: string]: Unit };
